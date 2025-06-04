@@ -151,10 +151,43 @@ const config: HardhatUserConfig = {
       url: "https://alfajores-forno.celo-testnet.org",
       accounts: [deployerPrivateKey],
     },
+    neondevnet: {
+      url: "https://devnet.neonevm.org",
+      accounts: [deployerPrivateKey],
+      chainId: 245022926,
+    },
+    neonmainnet: {
+      url: "https://neon-proxy-mainnet.solana.p2p.org",
+      accounts: [deployerPrivateKey],
+      chainId: 245022934,
+    },
   },
   // Configuration for harhdat-verify plugin
   etherscan: {
-    apiKey: `${etherscanApiKey}`,
+    apiKey: {
+      neonevm: "test",
+      mainnet: etherscanApiKey,
+      optimisticEthereum: etherscanOptimisticApiKey,
+      base: basescanApiKey,
+    },
+    customChains: [
+      {
+        network: "neonevm",
+        chainId: 245022926,
+        urls: {
+          apiURL: "https://devnet-api.neonscan.org/hardhat/verify",
+          browserURL: "https://devnet.neonscan.org",
+        },
+      },
+      {
+        network: "neonevm",
+        chainId: 245022934,
+        urls: {
+          apiURL: "https://api.neonscan.org/hardhat/verify",
+          browserURL: "https://neonscan.org",
+        },
+      },
+    ],
   },
   // Configuration for etherscan-verify from hardhat-deploy plugin
   verify: {
