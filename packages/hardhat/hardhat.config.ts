@@ -176,18 +176,18 @@ const config: HardhatUserConfig = {
         chainId: 245022926,
         urls: {
           apiURL: "https://devnet-api.neonscan.org/hardhat/verify",
-          browserURL: "https://devnet.neonscan.org"
-        }
+          browserURL: "https://devnet.neonscan.org",
+        },
       },
       {
         network: "neonevm",
         chainId: 245022934,
         urls: {
           apiURL: "https://api.neonscan.org/hardhat/verify",
-          browserURL: "https://neonscan.org"
-        }
-      }
-    ]
+          browserURL: "https://neonscan.org",
+        },
+      },
+    ],
   },
   // Configuration for etherscan-verify from hardhat-deploy plugin
   verify: {
