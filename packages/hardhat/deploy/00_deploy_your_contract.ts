@@ -44,7 +44,13 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   await deploy("SimpleAbra", {
     from: deployer,
     // Contract constructor arguments
-    args: ["0x512E48836Cd42F3eB6f50CEd9ffD81E0a7F15103"],
+    args: [
+      "0x512E48836Cd42F3eB6f50CEd9ffD81E0a7F15103",
+      "0xF6b17787154C418d5773Ea22Afc87A95CAA3e957",
+      "Чаробни Internet Money",
+      "4ap",
+      6,
+    ],
     log: true,
     // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
     // automatically mining the contract deployment transaction. There is no effect on live networks.

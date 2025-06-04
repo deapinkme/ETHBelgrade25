@@ -1,0 +1,36 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/SimpleAbra.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ninterface IERC20ForSPLFactory {\n    function createErc20ForSplMintable(\n        string memory name,\n        string memory symbol,\n        uint8 decimals,\n        address mint_authority\n    ) external returns (address);\n}\n\ninterface IERC20 {\n    function transferFrom(address from, address to, uint256 value) external returns (bool);\n    function transfer(address to, uint256 value) external returns (bool);\n    function allowance(address owner, address spender) external view returns (uint256);\n}\n\ninterface IERC20ForSPL {\n    function mint(address to, uint256 amount) external;\n    function transferFrom(address from, address to, uint256 value) external returns (bool);\n    function allowance(address owner, address spender) external view returns (uint256);\n}\n\ncontract SimpleAbra {\n    IERC20 public collateralToken;        // e.g., USDC\n    IERC20ForSPL public outputToken;      // 4ap token with mint/burn capability\n    address public owner;\n\n    mapping(address => uint256) public collateralBalance;\n    mapping(address => uint256) public debt;\n\n    uint256 public collateralFactor = 50; // 50% LTV (Loan to Value)\n\n    event CollateralDeposited(address indexed user, uint256 amount);\n    event CollateralWithdrawn(address indexed user, uint256 amount);\n    event TokensBorrowed(address indexed user, uint256 amount);\n    event TokensRepaid(address indexed user, uint256 amount);\n\n    constructor(\n        address _collateralToken,\n        address _factory, // ERC20ForSPL factory address\n        string memory _name,\n        string memory _symbol,\n        uint8 _decimals\n    ) {\n        collateralToken = IERC20(_collateralToken);\n        owner = msg.sender;\n        \n        // Create a new ERC20ForSPL-Mintable token using the factory\n        address tokenAddress = IERC20ForSPLFactory(_factory).createErc20ForSplMintable(\n            _name,\n            _symbol,\n            _decimals,\n            address(this) // This contract will be the mint authority\n        );\n        outputToken = IERC20ForSPL(tokenAddress);\n    }\n\n    // Deposit USDC to the contract\n    function depositCollateral(uint256 amount) external {\n        require(amount > 0, \"amount = 0\");\n        // Note: User must approve this contract to spend their collateral tokens first\n        collateralToken.transferFrom(msg.sender, address(this), amount);\n        collateralBalance[msg.sender] += amount;\n        emit CollateralDeposited(msg.sender, amount);\n    }\n\n    // Borrow 4ap (mint new tokens)\n    function borrow(uint256 outputTokenAmount) external {\n        uint256 maxBorrow = (collateralBalance[msg.sender] * collateralFactor) / 100;\n        require(outputTokenAmount <= maxBorrow, \"Exceeds max borrow limit\");\n\n        debt[msg.sender] += outputTokenAmount;\n        outputToken.mint(msg.sender, outputTokenAmount);\n        emit TokensBorrowed(msg.sender, outputTokenAmount);\n    }\n\n    // Repay 4ap (collect tokens in contract)\n    function repay(uint256 outputTokenAmount) external {\n        require(outputTokenAmount > 0 && debt[msg.sender] >= outputTokenAmount, \"Invalid repayment\");\n        // Note: User must approve this contract to spend their output tokens first\n        outputToken.transferFrom(msg.sender, address(this), outputTokenAmount);\n        debt[msg.sender] -= outputTokenAmount;\n        emit TokensRepaid(msg.sender, outputTokenAmount);\n    }\n\n    // Withdraw USDC from the contract\n    function withdrawCollateral(uint256 amount) external {\n        require(collateralBalance[msg.sender] >= amount, \"Not enough collateral\");\n\n        // Recalculate max borrow after withdrawal\n        uint256 remainingCollateral = collateralBalance[msg.sender] - amount;\n        uint256 maxDebt = (remainingCollateral * collateralFactor) / 100;\n        require(debt[msg.sender] <= maxDebt, \"Too much debt\");\n\n        collateralBalance[msg.sender] -= amount;\n        collateralToken.transfer(msg.sender, amount);\n        emit CollateralWithdrawn(msg.sender, amount);\n    }\n\n    function checkCollateralAllowance(address user) external view returns (uint256) {\n        return collateralToken.allowance(user, address(this));\n    }\n\n    function checkOutputTokenAllowance(address user) external view returns (uint256) {\n        return outputToken.allowance(user, address(this));\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "evmVersion": "paris",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

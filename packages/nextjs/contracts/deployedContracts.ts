@@ -308,7 +308,7 @@ const deployedContracts = {
   },
   245022926: {
     SimpleAbra: {
-      address: "0x06f265Ca3bE3d4785DDE667301A59bd349eC70a4",
+      address: "0xA45B262AC01240298B4809f5f19F71e8567dAea9",
       abi: [
         {
           inputs: [
@@ -316,6 +316,26 @@ const deployedContracts = {
               internalType: "address",
               name: "_collateralToken",
               type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_factory",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "_name",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_symbol",
+              type: "string",
+            },
+            {
+              internalType: "uint8",
+              name: "_decimals",
+              type: "uint8",
             },
           ],
           stateMutability: "nonpayable",
@@ -540,19 +560,6 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "outputTokenSet",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
           name: "owner",
           outputs: [
             {
@@ -573,19 +580,6 @@ const deployedContracts = {
             },
           ],
           name: "repay",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_outputToken",
-              type: "address",
-            },
-          ],
-          name: "setOutputToken",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
