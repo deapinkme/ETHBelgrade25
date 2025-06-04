@@ -22,6 +22,25 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
+  // const DEVNET_ERC20ForSPL_FACTORY = "0xF6b17787154C418d5773Ea22Afc87A95CAA3e957";
+
+  // const ERC20ForSplMintableContract = await ethers.getContractFactory("ERC20ForSplMintable");
+
+  // await deploy("ERC20ForSplMintable", {
+  //   from: deployer,
+  //   log: true,
+  //   autoMine: true,
+  // });
+
+  // await deploy("OutputToken", {
+  //   from: deployer,
+  //   log: true,
+  //   autoMine: true,
+  // });
+
+  // const outputToken = await hre.ethers.getContract<Contract>("OutputToken", deployer);
+  // console.log("👋 OutputToken deployed to:", outputToken.target);
+
   await deploy("YourContract", {
     from: deployer,
     // Contract constructor arguments
