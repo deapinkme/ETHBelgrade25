@@ -9,37 +9,51 @@ interface IERC20 {
 contract SimpleAbra {
     IERC20 public collateralToken;        // e.g., yvUSDT
     IERC20 public outputToken;            // 4ap (mock stablecoin)
+    address public owner;
+    bool public outputTokenSet;
 
     mapping(address => uint256) public collateralBalance;
     mapping(address => uint256) public debt;
 
     uint256 public collateralFactor = 50; // 50% LTV (Loan to Value)
 
-    constructor(address _collateralToken, address _outputToken) {
+    constructor(address _collateralToken) {
         collateralToken = IERC20(_collateralToken);
-        outputToken = IERC20(_outputToken);
+        owner = msg.sender;
     }
 
+    function setOutputToken(address _outputToken) external {
+        require(msg.sender == owner, "Only owner");
+        require(!outputTokenSet, "Output token already set");
+        outputToken = IERC20(_outputToken);
+        outputTokenSet = true;
+    }
+
+    // Deposit USDC to the contract
     function depositCollateral(uint256 amount) external {
         require(amount > 0, "amount = 0");
         collateralToken.transferFrom(msg.sender, address(this), amount);
         collateralBalance[msg.sender] += amount;
     }
 
-    function borrow(uint256 mimAmount) external {
+    // Borrow 4ap (mock stablecoin)
+    function borrow(uint256 outputTokenAmount) external {
+        require(outputTokenSet, "Output token not set");
         uint256 maxBorrow = (collateralBalance[msg.sender] * collateralFactor) / 100;
-        require(mimAmount <= maxBorrow, "Exceeds max borrow limit");
+        require(outputTokenAmount <= maxBorrow, "Exceeds max borrow limit");
 
-        debt[msg.sender] += mimAmount;
-        outputToken.transfer(msg.sender, mimAmount);
+        debt[msg.sender] += outputTokenAmount;
+        outputToken.transfer(msg.sender, outputTokenAmount);
     }
 
+    // Repay 4ap (mock stablecoin)
     function repay(uint256 outputTokenAmount) external {
         require(outputTokenAmount > 0 && debt[msg.sender] >= outputTokenAmount, "Invalid repayment");
         outputToken.transferFrom(msg.sender, address(this), outputTokenAmount);
         debt[msg.sender] -= outputTokenAmount;
     }
 
+    // Withdraw USDC from the contract
     function withdrawCollateral(uint256 amount) external {
         require(collateralBalance[msg.sender] >= amount, "Not enough collateral");
 
