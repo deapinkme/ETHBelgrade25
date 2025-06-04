@@ -166,6 +166,7 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       neonevm: "test",
+      "neon-devnet": "empty",
       mainnet: etherscanApiKey,
       optimisticEthereum: etherscanOptimisticApiKey,
       base: basescanApiKey,
@@ -185,6 +186,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api.neonscan.org/hardhat/verify",
           browserURL: "https://neonscan.org",
+        },
+      },
+      {
+        network: "neon-devnet",
+        chainId: 245022926,
+        urls: {
+          apiURL: "https://neon-devnet.blockscout.com/api",
+          browserURL: "https://neon-devnet.blockscout.com",
         },
       },
     ],
