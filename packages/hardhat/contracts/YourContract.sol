@@ -20,11 +20,14 @@ contract YourContract {
     uint256 public totalCounter = 0;
     mapping(address => uint) public userGreetingCounter;
     mapping(address => uint256) public balances;
+    mapping(address => uint256) public borrowedAmounts;
 
     // Events: a way to emit log statements from smart contract that can be listened to by external parties
     event GreetingChange(address indexed greetingSetter, string newGreeting, bool premium, uint256 value);
     event Deposit(address indexed user, uint256 amount);
     event Withdraw(address indexed user, uint256 amount);
+    event Borrow(address indexed user, uint256 amount);
+    event Repay(address indexed user, uint256 amount);
 
     // Constructor: Called once on contract deployment
     // Check packages/hardhat/deploy/00_deploy_your_contract.ts
@@ -94,5 +97,25 @@ contract YourContract {
 
     function getBalance() external view returns (uint256) {
         return balances[msg.sender];
+    }
+
+    function borrow(uint256 amount) external {
+        require(amount > 0, "Amount must be greater than 0");
+        require(balances[msg.sender] >= amount * 2, "Insufficient collateral");
+        
+        borrowedAmounts[msg.sender] += amount;
+        (bool success, ) = msg.sender.call{value: amount}("");
+        require(success, "Transfer failed");
+        emit Borrow(msg.sender, amount);
+    }
+
+    function repay(uint256 amount) external payable {
+        require(amount > 0, "Amount must be greater than 0");
+        require(borrowedAmounts[msg.sender] >= amount, "Repay amount exceeds borrowed amount");
+        require(msg.value >= amount, "Insufficient repayment amount");
+        
+        borrowedAmounts[msg.sender] -= amount;
+        balances[msg.sender] += msg.value - amount;
+        emit Repay(msg.sender, amount);
     }
 }
