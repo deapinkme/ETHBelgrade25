@@ -38,3 +38,8 @@ function depositCollateral(uint256 amount)
 function borrow(uint256 mimAmount) // 4ap
 function repay(uint256 mimAmount)
 function withdrawCollateral(uint256 amount)
+
+---
+
+## 🎥 DEMO VIDEO
+[Vnemo Video](https://youtu.be/TI72I8CmNnw)
