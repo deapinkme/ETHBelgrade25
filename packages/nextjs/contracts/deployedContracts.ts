@@ -6,14 +6,14 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
   31337: {
-    YourContract: {
-      address: "0x1613beB3B2C4f22Ee086B2b38C1476A3cE7f78E8",
+    SimpleAbra: {
+      address: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
       abi: [
         {
           inputs: [
             {
               internalType: "address",
-              name: "_owner",
+              name: "_collateralToken",
               type: "address",
             },
           ],
@@ -36,7 +36,7 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "Borrow",
+          name: "CollateralDeposited",
           type: "event",
         },
         {
@@ -55,38 +55,7 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "Deposit",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "greetingSetter",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "string",
-              name: "newGreeting",
-              type: "string",
-            },
-            {
-              indexed: false,
-              internalType: "bool",
-              name: "premium",
-              type: "bool",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "GreetingChange",
+          name: "CollateralWithdrawn",
           type: "event",
         },
         {
@@ -105,7 +74,7 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "Repay",
+          name: "TokensBorrowed",
           type: "event",
         },
         {
@@ -124,33 +93,14 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "Withdraw",
+          name: "TokensRepaid",
           type: "event",
         },
         {
           inputs: [
             {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          name: "balances",
-          outputs: [
-            {
               internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "amount",
+              name: "outputTokenAmount",
               type: "uint256",
             },
           ],
@@ -163,11 +113,49 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "address",
+              name: "user",
+              type: "address",
+            },
+          ],
+          name: "checkCollateralAllowance",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+          ],
+          name: "checkOutputTokenAllowance",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
               name: "",
               type: "address",
             },
           ],
-          name: "borrowedAmounts",
+          name: "collateralBalance",
           outputs: [
             {
               internalType: "uint256",
@@ -180,19 +168,70 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "deposit",
+          name: "collateralFactor",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "collateralToken",
+          outputs: [
+            {
+              internalType: "contract IERC20",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "debt",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+          ],
+          name: "depositCollateral",
           outputs: [],
-          stateMutability: "payable",
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
           inputs: [],
-          name: "getBalance",
+          name: "outputToken",
           outputs: [
             {
-              internalType: "uint256",
+              internalType: "contract IERC20ForSPL",
               name: "",
-              type: "uint256",
+              type: "address",
             },
           ],
           stateMutability: "view",
@@ -200,12 +239,12 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "greeting",
+          name: "outputTokenSet",
           outputs: [
             {
-              internalType: "string",
+              internalType: "bool",
               name: "",
-              type: "string",
+              type: "bool",
             },
           ],
           stateMutability: "view",
@@ -225,16 +264,29 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
-          name: "premium",
-          outputs: [
+          inputs: [
             {
-              internalType: "bool",
-              name: "",
-              type: "bool",
+              internalType: "uint256",
+              name: "outputTokenAmount",
+              type: "uint256",
             },
           ],
-          stateMutability: "view",
+          name: "repay",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_outputToken",
+              type: "address",
+            },
+          ],
+          name: "setOutputToken",
+          outputs: [],
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
@@ -245,27 +297,167 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "repay",
+          name: "withdrawCollateral",
           outputs: [],
-          stateMutability: "payable",
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {},
+    },
+  },
+  245022926: {
+    SimpleAbra: {
+      address: "0xA45B262AC01240298B4809f5f19F71e8567dAea9",
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_collateralToken",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_factory",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "_name",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_symbol",
+              type: "string",
+            },
+            {
+              internalType: "uint8",
+              name: "_decimals",
+              type: "uint8",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+          ],
+          name: "CollateralDeposited",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+          ],
+          name: "CollateralWithdrawn",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+          ],
+          name: "TokensBorrowed",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+          ],
+          name: "TokensRepaid",
+          type: "event",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "outputTokenAmount",
+              type: "uint256",
+            },
+          ],
+          name: "borrow",
+          outputs: [],
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
           inputs: [
             {
-              internalType: "string",
-              name: "_newGreeting",
-              type: "string",
+              internalType: "address",
+              name: "user",
+              type: "address",
             },
           ],
-          name: "setGreeting",
-          outputs: [],
-          stateMutability: "payable",
+          name: "checkCollateralAllowance",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
           type: "function",
         },
         {
-          inputs: [],
-          name: "totalCounter",
+          inputs: [
+            {
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+          ],
+          name: "checkOutputTokenAllowance",
           outputs: [
             {
               internalType: "uint256",
@@ -284,7 +476,52 @@ const deployedContracts = {
               type: "address",
             },
           ],
-          name: "userGreetingCounter",
+          name: "collateralBalance",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "collateralFactor",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "collateralToken",
+          outputs: [
+            {
+              internalType: "contract IERC20",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "debt",
           outputs: [
             {
               internalType: "uint256",
@@ -303,21 +540,62 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "withdraw",
+          name: "depositCollateral",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
         },
         {
           inputs: [],
-          name: "withdraw",
+          name: "outputToken",
+          outputs: [
+            {
+              internalType: "contract IERC20ForSPL",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "owner",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "outputTokenAmount",
+              type: "uint256",
+            },
+          ],
+          name: "repay",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
         },
         {
-          stateMutability: "payable",
-          type: "receive",
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+          ],
+          name: "withdrawCollateral",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
         },
       ],
       inheritedFunctions: {},
