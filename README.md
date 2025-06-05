@@ -42,4 +42,4 @@ function withdrawCollateral(uint256 amount)
 ---
 
 ## 🎥 DEMO VIDEO
-[Vnemo Video](https://youtu.be/TI72I8CmNnw)
+https://youtu.be/TI72I8CmNnw
