@@ -56,5 +56,9 @@
   "packageManager": "yarn@3.2.3",
   "engines": {
     "node": ">=20.18.3"
+  },
+  "dependencies": {
+    "@solana/wallet-adapter-react": "^0.15.38",
+    "react": "^19.1.0"
   }
 }
