@@ -8,6 +8,7 @@ import { Address, Balance } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { WalletButton } from "~~/components/Wallet/WalletButton";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useSimpleAbra } from '~~/hooks/useSimpleAbra';
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
@@ -17,22 +18,22 @@ const Home: NextPage = () => {
   const [borrowAmount, setBorrowAmount] = useState("");
   const [repayAmount, setRepayAmount] = useState("");
 
-  const { writeContractAsync: deposit } = useScaffoldWriteContract("YourContract");
-  const { writeContractAsync: withdraw } = useScaffoldWriteContract("YourContract");
-  const { writeContractAsync: borrow } = useScaffoldWriteContract("YourContract");
-  const { writeContractAsync: repay } = useScaffoldWriteContract("YourContract");
-  const { data: contractBalance } = useScaffoldReadContract({
-    contractName: "YourContract",
-    functionName: "getBalance",
-  });
+  const {
+    collateralBalance,
+    debt,
+    contractBalance,
+    loading,
+    error,
+    deposit,
+    withdraw,
+    borrow,
+    repay
+  } = useSimpleAbra();
 
   const handleDeposit = async () => {
     if (!depositAmount) return;
     try {
-      await deposit({
-        functionName: "deposit",
-        value: parseEther(depositAmount),
-      });
+      await deposit(depositAmount);
       setDepositAmount("");
     } catch (error) {
       console.error("Error depositing:", error);
@@ -42,10 +43,7 @@ const Home: NextPage = () => {
   const handleWithdraw = async () => {
     if (!withdrawAmount) return;
     try {
-      await withdraw({
-        functionName: "withdraw",
-        args: [parseEther(withdrawAmount)],
-      } as any);
+      await withdraw(withdrawAmount);
       setWithdrawAmount("");
     } catch (error) {
       console.error("Error withdrawing:", error);
@@ -55,10 +53,7 @@ const Home: NextPage = () => {
   const handleBorrow = async () => {
     if (!borrowAmount) return;
     try {
-      await borrow({
-        functionName: "borrow",
-        args: [parseEther(borrowAmount)],
-      } as any);
+      await borrow(borrowAmount);
       setBorrowAmount("");
     } catch (error) {
       console.error("Error borrowing:", error);
@@ -68,11 +63,7 @@ const Home: NextPage = () => {
   const handleRepay = async () => {
     if (!repayAmount) return;
     try {
-      await repay({
-        functionName: "repay",
-        args: [parseEther(repayAmount)],
-        value: parseEther(repayAmount),
-      } as any);
+      await repay(repayAmount);
       setRepayAmount("");
     } catch (error) {
       console.error("Error repaying:", error);

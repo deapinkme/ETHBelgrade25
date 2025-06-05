@@ -36,8 +36,6 @@ export const ProxyConnectionProvider: FC<Props> = ({ children }) => {
   const [solanaUser, setSolanaUser] = useState<SolanaNeonAccount>();
   const [provider, setProvider] = useState<JsonRpcProvider>();
   const [walletBalance, setWalletBalance] = useState(0);
-  const data = tokens(PROXY_ENV);
-  const [addresses, setAddresses] = useState<TokensListResponse>(data);
   let watchAccountId: number;
 
   const getWalletBalance = async () => {
@@ -112,19 +110,6 @@ export const ProxyConnectionProvider: FC<Props> = ({ children }) => {
     }
   }, [publicKey, connection, getWalletBalance]);
 
-  useEffect(() => {
-    const getAddresses = async () => {
-      try {
-        const addresses = await getTokensList(PROXY_ENV);
-        setAddresses(addresses);
-      } catch (_) {
-        const addresses = tokens(PROXY_ENV);
-        setAddresses(addresses);
-      }
-    };
-    getAddresses().then();
-  }, []);
-
   return (
     <ProxyConnectionContext.Provider value={{
       chainId: chainId!,
@@ -134,7 +119,6 @@ export const ProxyConnectionProvider: FC<Props> = ({ children }) => {
       proxyApi: proxyApi!,
       provider: provider!,
       walletBalance,
-      addresses,
       sendTransaction,
       getWalletBalance
     }}>

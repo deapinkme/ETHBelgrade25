@@ -1,59 +1,37 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Connection, PublicKey } from '@solana/web3.js';
+import React from 'react';
+import {
+    ConnectionProvider,
+    WalletProvider as SolanaWalletProvider
+} from '@solana/wallet-adapter-react';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import {
+    PhantomWalletAdapter,
+    SolflareWalletAdapter,
+} from '@solana/wallet-adapter-wallets';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { clusterApiUrl } from '@solana/web3.js';
 
-
-interface WalletContextType {
-  connection: Connection | null;
-  publicKey: PublicKey | null;
-  connect: () => Promise<void>;
-  disconnect: () => void;
-}
-
-const WalletContext = createContext<WalletContextType>({
-  connection: null,
-  publicKey: null,
-  connect: async () => {},
-  disconnect: () => {},
-});
-
-export const useWallet = () => useContext(WalletContext);
+// Default styles that can be overridden by your app
+require('@solana/wallet-adapter-react-ui/styles.css');
 
 export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [connection, setConnection] = useState<Connection | null>(null);
-  const [publicKey, setPublicKey] = useState<PublicKey | null>(null);
+    // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
+    const network = WalletAdapterNetwork.Devnet;
+    const endpoint = clusterApiUrl(network);
 
-  useEffect(() => {
-    // Initialize Solana connection
-    const conn = new Connection('https://api.devnet.solana.com', 'confirmed');
-    setConnection(conn);
-  }, []);
+    // You can provide multiple wallet adapters
+    const wallets = [
+        new PhantomWalletAdapter(),
+        new SolflareWalletAdapter(),
+    ];
 
-  const connect = async () => {
-    try {
-      // Check if Phantom is installed
-      const { solana } = window as any;
-      if (!solana?.isPhantom) {
-        alert('Phantom wallet is not installed!');
-        return;
-      }
-
-      // Connect to Phantom
-      const response = await solana.connect();
-      setPublicKey(new PublicKey(response.publicKey));
-    } catch (error) {
-      console.error('Error connecting to wallet:', error);
-    }
-  };
-
-  const disconnect = () => {
-    setPublicKey(null);
-  };
-
-  return (
-    <WalletContext.Provider value={{ connection, publicKey, connect, disconnect }}>
-      {children}
-    </WalletContext.Provider>
-  );
+    return (
+        <ConnectionProvider endpoint={endpoint}>
+            <SolanaWalletProvider wallets={wallets} autoConnect>
+                <WalletModalProvider>{children}</WalletModalProvider>
+            </SolanaWalletProvider>
+        </ConnectionProvider>
+    );
 }; 
